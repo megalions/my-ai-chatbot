@@ -159,7 +159,7 @@ with st.sidebar:
             f'<div class="file-chip">📄 แนบไฟล์อยู่: <b>{st.session_state.uploaded_file_ref["name"]}</b></div>',
             unsafe_allow_html=True
         )
-        if st.button("❌ ลบไฟล์ที่แนบ", size="small"):
+        if st.button("❌ ลบไฟล์ที่แนบ"):
             st.session_state.uploaded_file_ref = None
             st.rerun()
 
