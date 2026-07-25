@@ -3,7 +3,7 @@ import tempfile
 import streamlit as st
 from google import genai
 from google.genai import types
- 
+
 # ==========================================
 # 1. Page Config & Custom Gemini UI Style
 # ==========================================
@@ -101,11 +101,11 @@ with st.sidebar:
     st.divider()
 
     # --- 2. API Key Configuration ---
-    api_key = os.environ.get("GEMINI_API_KEY", "")
+    api_key = st.secrets.get("GEMINI_API_KEY", "") or os.environ.get("GEMINI_API_KEY", "")
     if not api_key:
         api_key = st.text_input("🔑 Enter Gemini API Key:", type="password")
         if not api_key:
-            st.warning("กรุณาใส่ API Key หรือตั้งค่า `GEMINI_API_KEY` ใน Environment")
+            st.warning("กรุณาใส่ API Key ใน Secrets ของ Streamlit หรือกรอกในช่องนี้")
 
     # --- 3. Mode Selection (Chatbot vs AI Agent) ---
     st.subheader("⚙️ Select Mode")
@@ -181,7 +181,7 @@ for message in st.session_state.messages:
 # User Input Box
 if prompt := st.chat_input("พิมพ์คำถามของคุณที่นี่..."):
     if not api_key:
-        st.error("กรุณากรอก Gemini API Key ใน Sidebar ก่อนเริ่มใช้งาน")
+        st.error("กรุณากรอก Gemini API Key ก่อนเริ่มใช้งาน")
         st.stop()
 
     # Display User Message
@@ -216,7 +216,6 @@ if prompt := st.chat_input("พิมพ์คำถามของคุณท�
                 # If a file is attached, pass the file object along with the latest user query
                 if st.session_state.uploaded_file_ref:
                     g_file = st.session_state.uploaded_file_ref["file_obj"]
-                    # Attach file reference with the payload
                     contents.append(g_file)
 
                 # Request model generation
@@ -232,26 +231,3 @@ if prompt := st.chat_input("พิมพ์คำถามของคุณท�
 
             except Exception as e:
                 st.error(f"เกิดข้อผิดพลาดในการรับข้อมูล: {e}")
-```eof
-
-ฉันได้ปรับปรุงเว็บแอปพลิเคชัน Streamlit ของคุณให้เรียบร้อยแล้ว โดยถอดแบบความสวยงามและฟังก์ชันการทำงานมาจาก **Google Gemini** โดยมีฟีเจอร์ใหม่ๆ ดังนี้:
-
-### 🌟 ฟีเจอร์ที่เพิ่มเข้ามาใหม่:
-1. **แท็บ/โหมดการทำงาน (Chatbot vs AI Agent):**
-   - **🤖 Chatbot:** โหมดสนทนาโต้ตอบทั่วไป รวดเร็ว แม่นยำ
-   - **⚡ AI Agent:** โหมดเอเจนต์ขั้นสูง โดยเปิดใช้งาน **Google Search Grounding** ช่วยให้ค้นหาข้อมูลสดใหม่บนอินเทอร์เน็ตมาตอบคำถามให้อัตโนมัติ
-2. **ปุ่ม New Chat (➕ New Chat):**
-   - อยู่ด้านบนสุดของ Sidebar สามารถกดล้างประวัติการสนทนาและคืนค่าสถานะเพื่อเริ่มแชตใหม่ได้ทันที
-3. **ระบบ Upload ไฟล์ (File Upload):**
-   - รองรับไฟล์หลากหลายชนิด (PDF, TXT, CSV, รูปภาพ, เสียง, วิดีโอ)
-   - ส่งไฟล์ผ่าน `Gemini Files API` (ด้วย SDK ตัวใหม่ `google-genai`) ให้โมเดลอ่านและวิเคราะห์ไฟล์ร่วมกับคำถามได้ทันที
-4. **จัดระเบียบหน้าตาเว็บแบบ Gemini UI (Dark Theme):**
-   - ตกแต่งด้วย CSS ปรับแต่ง Sidebar, ปุ่มกด, และ Badge แสดงสถานะโหมดให้สวยงาม สะอาดตา เหมือนการใช้งาน Gemini Web App
-
----
-
-### 📦 ไลบรารีที่จำเป็นต้องติดตั้ง (`requirements.txt`):
-```text
-streamlit
-google-genai
-pillow
